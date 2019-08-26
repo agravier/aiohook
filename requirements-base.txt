@@ -1,0 +1,16 @@
+anyio
+behave
+flake8
+pytest
+pytest-cov
+pytest-xdist
+pytest-bdd
+sphinx
+sphinxcontrib-napoleon
+tox
+wheel
+setuptools>=30.3.0
+setuptools_scm
+tox
+coverage
+mypy
