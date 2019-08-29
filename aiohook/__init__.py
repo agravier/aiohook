@@ -67,7 +67,7 @@ class PluginRegistry(metaclass=Singleton):
             if self.ref_to_impl[ref].impl_ref == fn_or_coro:
                 return
             raise AIOHookError(f'Another plugin is already registered for '
-                               f'{ref}: ({self.ref_to_impl[ref]})')
+                               f'{ref}: {self.ref_to_impl[ref]}')
         self.ref_to_impl[ref] = Hook(typ=infer_type(fn_or_coro),
                                      impl_ref=fn_or_coro)
 
@@ -90,10 +90,8 @@ def spec(fn: F) -> F:
             try:
                 impl: Hook = PluginRegistry().ref_to_impl[spec_ref]
             except KeyError:
-                print(f'Calling default impl of {spec_ref}')
                 return fn(*args, **kwargs)
             else:
-                print(f'Calling plugin impl of {spec_ref}: {impl.impl_ref}')
                 return impl.impl_ref(*args, **kwargs)
         return cast(F, wrapper)
     elif object_type == ObjectType.async_function:
@@ -102,10 +100,8 @@ def spec(fn: F) -> F:
             try:
                 impl: Hook = PluginRegistry().ref_to_impl[spec_ref]
             except KeyError:
-                print(f'Calling default impl of {spec_ref}')
                 return await fn(*args, **kwargs)
             else:
-                print(f'Calling plugin impl of {spec_ref}: {impl.impl_ref}')
                 return await impl.impl_ref(*args, **kwargs)
         return cast(F, wrapper)
     elif object_type == ObjectType.async_generator_function:
@@ -114,11 +110,9 @@ def spec(fn: F) -> F:
             try:
                 impl: Hook = PluginRegistry().ref_to_impl[spec_ref]
             except KeyError:
-                print(f'Calling default impl of {spec_ref}')
                 async for res in fn(*args, **kwargs):
                     yield res
             else:
-                print(f'Calling plugin impl of {spec_ref}: {impl.impl_ref}')
                 async for res in impl.impl_ref(*args, **kwargs):
                     yield res
 
@@ -131,7 +125,6 @@ def impl(spec_ref: str) -> Callable[[F], F]:
     spec_ref = SpecRef(spec_ref)
 
     def mark_function(func: F) -> F:
-        PluginRegistry().register_hook_impl(spec_ref, func)
         setattr(func, ATTR_MARKER, {HOOK_SPEC_REF_KEY: spec_ref})
         return func
 
@@ -139,7 +132,6 @@ def impl(spec_ref: str) -> Callable[[F], F]:
 
 
 def register(obj):
-    print(f"registering {obj}")
     typ: ObjectType = infer_type(obj)
     if typ == ObjectType.module or typ == ObjectType.instance:
         all_hooks = find_hook_implementations(obj)
@@ -151,7 +143,6 @@ def register(obj):
             try:
                 spec_ref = SpecRef(hook_marker[HOOK_SPEC_REF_KEY])
             except KeyError:
-                print('Missing spec ref key in hook marker. This may be a bug.')
                 return
             PluginRegistry().register_hook_impl(spec_ref, obj)
     else:
