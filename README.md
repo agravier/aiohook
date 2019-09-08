@@ -28,7 +28,7 @@ You must first define the signature of each hook function, for
 instance in a separate _pluginspecs.py_ file:
 
 ```python
-from typing import Sequence, Optional
+from typing import AsyncIterator, Optional
 import aiohook
 
 @aiohook.spec
@@ -44,8 +44,8 @@ async def transform_token(word: str) -> Optional[str]:
     """Preprocess each raw token, for instance as a normalization step."""
 ```
 
-In your application code, you then call your spec'ed out functions as if they had 
-already been implemented:
+In your application code, you then call your spec'ed out functions as if they
+had already been implemented:
 
 ```python
 import sys, asyncio, importlib, aiohook
@@ -65,8 +65,34 @@ if __name__ == '__main__':
 
 ### Plugin developer
 
+Gromit wants to use Wallace's application to transform text files. He creates a 
+pip-installable module in which the _gromify.py_ file looks as follows:
 
+```python
+import asyncio, aiohook, random
+from typing import AsyncIterator, Optional
 
+@aiohook.impl('pluginspecs.tokenize')
+async def give_word(text: str) -> AsyncIterator[str]:
+    for w in text.split():
+        yield w
+
+@aiohook.impl('pluginspecs.transform_token')
+async def bark_and_pause(word: str) -> Optional[str]:
+    await asyncio.sleep(random.uniform(0, 2))
+    return 'woo' + 'o'*(max(len(word) - 2, 0)) + 'f'
+```
+
+Gromit pip-installs his plugin and Wallace's text processing app, and then calls 
+the latter, providing as first argument the absolute import path to the gromify
+module.
+
+Note that I haven't actually tried the above example, and also that it makes
+little sense to use async functions in this case, but I think it illustrates the
+basic usage os aiohook nicely.
+
+For less silly examples, please refer to the sample applications used as
+functional tests in [tests/functional](tests/functional)
 
 ## Development
 
@@ -97,8 +123,9 @@ pip install -e .
 pip install -r requirements.txt
 ```
 
-To work on one of the functional test applications under _tests/functional_, it
-is useful to also install it in editable mode in the same environment:
+To work on one of the functional test applications under
+[tests/functional(tests/functional), it is useful to also install it in editable
+mode in the same environment:
 
 ```shell script
 pip install -e tests/functional/text_processing_app
