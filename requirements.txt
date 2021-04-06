@@ -19,7 +19,7 @@ glob2==0.7
 idna==2.8
 imagesize==1.1.0
 importlib-metadata==0.20
-Jinja2==2.10.1
+Jinja2==2.11.3
 Mako==1.1.0
 MarkupSafe==1.1.1
 mccabe==0.6.1
