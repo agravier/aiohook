@@ -34,7 +34,7 @@ pockets==0.7.2
 py==1.10.0
 pycodestyle==2.5.0
 pyflakes==2.1.1
-Pygments==2.7.4
+Pygments==2.15.0
 pyparsing==2.4.2
 pytest==5.1.2
 pytest-bdd==3.2.1
