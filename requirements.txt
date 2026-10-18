@@ -1,6 +1,6 @@
 -e git+git@github.com:agravier/aiohook.git@f01a8557ba60a6dbfb32fa9095e32890676f7a9a#egg=aiohook
 alabaster==0.7.12
-anyio==1.1.0
+anyio==4.14.2
 apipkg==1.5
 async-generator==1.10
 atomicwrites==1.3.0
